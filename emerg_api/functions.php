@@ -39,7 +39,7 @@
 		{
 			
 			$this->response["success"] = 1;
-			$this->response["success_msg"] = "You Entered ".$test;
+			$this->response["success_msg"] = "Emerg ".$test;
 
 
 			return json_encode($this->response);
