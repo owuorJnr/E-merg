@@ -4,6 +4,8 @@
 *@since 31st Jul, 2014
 *@version 1.0
 *@author Dickson Owuor
+*
+*
 */
 
 	class FUNCTIONS
@@ -39,7 +41,7 @@
 		{
 			
 			$this->response["success"] = 1;
-			$this->response["success_msg"] = "You Entered ".$test;
+			$this->response["success_msg"] = "Emerg ".$test;
 
 
 			return json_encode($this->response);
