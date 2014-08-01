@@ -45,12 +45,14 @@
 			return json_encode($this->response);
 		}//end of function test
 
-		function add_center()
+		function add_center($name,$lat,$lon,$email,$phone1,$phone2,$phone3)
 		{
 			$alreadyAdded = $this->check_location($lat,$lon);
 
 			if($alreadyAdded === FALSE){
-				$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL) VALUES()";
+				//generate center_no
+
+				$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$lat','$lon','$email',NOW())";
 				$result = mysql_query($query) or die(mysql_error());
 				if(mysql_affected_rows() > 0){
 
@@ -60,6 +62,7 @@
 
 					$this->response["success"] = 1;
 					$this->response["success_msg"] = "Center added";
+					$this->response["center_no"] = $center_no;
 				}else{
 
 					$this->response["error"] = 1;
@@ -77,10 +80,10 @@
 		}//end of function
 
 
-		function add_services()
+		function add_services($center_no,$service)
 		{
 			
-			$query = "INSERT INTO tbl_center_services(CENTER_NO,SERVICE) VALUES()";
+			$query = "INSERT INTO tbl_center_services(CENTER_NO,SERVICE) VALUES('$center_no','$service')";
 			$result = mysql_query($query) or die(mysql_error());
 			if(mysql_affected_rows() > 0){
 
