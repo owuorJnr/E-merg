@@ -4,8 +4,6 @@
 *@since 31st Jul, 2014
 *@version 1.0
 *@author Dickson Owuor
-*
-*
 */
 
 	class FUNCTIONS
@@ -41,7 +39,7 @@
 		{
 			
 			$this->response["success"] = 1;
-			$this->response["success_msg"] = "Emerg ".$test;
+			$this->response["success_msg"] = "You Entered ".$test;
 
 
 			return json_encode($this->response);
@@ -49,32 +47,41 @@
 
 		function add_center($name,$lat,$lon,$email,$phone1,$phone2,$phone3)
 		{
-			$alreadyAdded = $this->check_location($lat,$lon);
 
-			if($alreadyAdded === FALSE){
-				//generate center_no
+			if($name == "" || $lat=="" || $lon=="" || $email=="" || $phone1=="" || $phone2=="" || $phone3==""){
 
-				$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$lat','$lon','$email',NOW())";
-				$result = mysql_query($query) or die(mysql_error());
-				if(mysql_affected_rows() > 0){
-
-					$this->add_contact($center_no,$phone1,$verified);
-					$this->add_contact($center_no,$phone2,$verified);
-					$this->add_contact($center_no,$phone3,$verified);
-
-					$this->response["success"] = 1;
-					$this->response["success_msg"] = "Center added";
-					$this->response["center_no"] = $center_no;
-				}else{
-
-					$this->response["error"] = 1;
-					$this->response["error_msg"] = "Center not added!";
-				}
+				$this->response["error"] = 1;
+				$this->response["error_msg"] = "Some values empty!";
 
 			}else{
 
-				$this->response["error"] = 1;
-				$this->response["error_msg"] = "Center already added!";
+				$alreadyAdded = $this->check_location($lat,$lon);
+
+				if($alreadyAdded === FALSE){
+					//generate center_no
+					$center_no = uniqid('cntr.');
+					$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$lat','$lon','$email',NOW())";
+					$result = mysql_query($query) or die(mysql_error());
+					if(mysql_affected_rows() > 0){
+						$verified = "NO";
+						$this->add_contact($center_no,$phone1,$verified);
+						$this->add_contact($center_no,$phone2,$verified);
+						$this->add_contact($center_no,$phone3,$verified);
+
+						$this->response["success"] = 1;
+						$this->response["success_msg"] = "Center added";
+						$this->response["center_no"] = $center_no;
+					}else{
+
+						$this->response["error"] = 1;
+						$this->response["error_msg"] = "Center not added!";
+					}
+
+				}else{
+
+					$this->response["error"] = 1;
+					$this->response["error_msg"] = "Center already added!";
+				}
 			}
 			
 
@@ -85,17 +92,38 @@
 		function add_services($center_no,$service)
 		{
 			
-			$query = "INSERT INTO tbl_center_services(CENTER_NO,SERVICE) VALUES('$center_no','$service')";
-			$result = mysql_query($query) or die(mysql_error());
-			if(mysql_affected_rows() > 0){
-
-				$this->response["success"] = 1;
-				$this->response["success_msg"] = "Services added";
-			}else{
+			if($center_no=="" || $service==""){
 
 				$this->response["error"] = 1;
-				$this->response["error_msg"] = "Services not added!";
+				$this->response["error_msg"] = "Some values empty!";
+
+			}else{
+
+				$query = "SELECT * FROM tbl_center_services WHERE CENTER_NO = '$center_no' AND SERVICE='$service'";
+				$result = mysql_query($query) or die(mysql_error());
+
+				if(mysql_affected_rows() > 0){
+
+					$this->response["error"] = 1;
+					$this->response["error_msg"] = "Services already added!";
+					
+				}else{
+
+					$query = "INSERT INTO tbl_center_services(CENTER_NO,SERVICE) VALUES('$center_no','$service')";
+					$result = mysql_query($query) or die(mysql_error());
+					if(mysql_affected_rows() > 0){
+
+						$this->response["success"] = 1;
+						$this->response["success_msg"] = "Services added";
+					}else{
+
+						$this->response["error"] = 1;
+						$this->response["error_msg"] = "Services not added!";
+					}
+				}
 			}
+
+
 
 			return json_encode($this->response);
 		}//end of function
@@ -105,8 +133,30 @@
 		function get_centers()
 		{
 			
-			$this->response["success"] = 1;
-			$this->response["success_msg"] = "Nearby centers retrieved";
+			$query = "SELECT * FROM tbl_emerg_centers";
+			$result = mysql_query($query) or die(mysql_error());
+			if(mysql_affected_rows() > 0){
+
+				$this->response["success"] = 1;
+				$this->response["success_msg"] = "Nearby centers retrieved";
+
+				$this->response["centers"] = array();
+
+    			while ($row = mysql_fetch_assoc($result)) {
+			        $itemArray = array();
+
+			        $itemArray["name"] = $row['NAME'];
+			        $itemArray["lat"] = $row['LOC_LAT'];
+			        $itemArray["lon"] = $row['LOC_LON'];
+			        array_push($this->response["centers"], $itemArray );
+
+			    }
+
+			}else{
+
+				$this->response["error"] = 1;
+				$this->response["error_msg"] = "Services not added!";
+			}
 
 			return json_encode($this->response);
 		}//end of function
@@ -116,7 +166,7 @@
 		private function check_location($lat,$lon)
 		{
 
-			$query = "SELECT * FROM tbl_emerg_centers WHERE LOC_LAT = '$lat' AND LOC_LAT='$lon'";
+			$query = "SELECT * FROM tbl_emerg_centers WHERE LOC_LAT = '$lat' AND LOC_LON='$lon'";
 			$result = mysql_query($query) or die(mysql_error());
 			if(mysql_affected_rows() > 0){
 				return TRUE;
@@ -135,7 +185,7 @@
 
 			}else{
 				
-				$query = "INSERT INTO tbl_center_contacts(CENTER_NO,CONTACT,VERIFIED) VALUES()";
+				$query = "INSERT INTO tbl_center_contacts(CENTER_NO,CONTACT,VERIFIED) VALUES('$center_no','$contact','$verified')";
 				$result = mysql_query($query) or die(mysql_error());
 				if(mysql_affected_rows() > 0){
 

@@ -21,7 +21,7 @@
 			//echo $emerg->get_centers()."<br>";
 		
 		}else if($req == "add-center"){
-			//center-no
+			
 			$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
 			$lat = filter_input(INPUT_POST, 'lat', FILTER_SANITIZE_STRING);
 			$lon = filter_input(INPUT_POST, 'lon', FILTER_SANITIZE_STRING);
