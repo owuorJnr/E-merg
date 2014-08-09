@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.e_merg.R;
 import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationManager;
@@ -15,16 +14,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.e_merg.R;
 import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class NearbyMapFragment extends MapFragment implements GoogleMap.OnMapClickListener{
+public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.OnMapClickListener{
 
     GoogleMap map;
     //Geocoder geocoder;
@@ -52,13 +52,13 @@ public class NearbyMapFragment extends MapFragment implements GoogleMap.OnMapCli
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
-        map = this.getMap();
+        /*map = this.getMap();
    		map.setMyLocationEnabled(true);
         //geocoder = new Geocoder(getActivity());
 
    		centerList = new ArrayList<Center>();
 
-        new GetCenters().execute();
+        //new GetCenters().execute();
 
         Location location = map.getMyLocation();
 
@@ -75,7 +75,7 @@ public class NearbyMapFragment extends MapFragment implements GoogleMap.OnMapCli
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
 
-        map.setOnMapClickListener(this);
+        map.setOnMapClickListener(this);*/
     }
 
 

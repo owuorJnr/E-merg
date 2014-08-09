@@ -109,7 +109,7 @@ public class MainActivity extends ActionBarActivity implements
 		}else if(id == R.id.action_map){
 			
 			//nearby centers in a map
-			getFragmentManager().beginTransaction()
+			getSupportFragmentManager().beginTransaction()
 			.replace(R.id.container, new NearbyMapFragment(),"Map Fragment")
 			.commit();
 			

@@ -7,12 +7,12 @@ import android.os.Bundle;
 import com.e_merg.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class PickLocationMapFragment extends MapFragment{
+public class PickLocationMapFragment extends SupportMapFragment{
 
     GoogleMap map;
     //Geocoder geocoder;
