@@ -1,6 +1,8 @@
 package com.e_merg.fragments;
 
-import com.e_merg.R;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -17,8 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.e_merg.R;
+import com.e_merg.adapters.NavigationAdapter;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation
@@ -53,6 +57,8 @@ public class NavigationDrawerFragment extends Fragment {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerListView;
 	private View mFragmentContainerView;
+	
+	private NavigationAdapter navigationAdapter;
 
 	private int mCurrentSelectedPosition = 0;
 	private boolean mFromSavedInstanceState;
@@ -103,12 +109,16 @@ public class NavigationDrawerFragment extends Fragment {
 						selectItem(position);
 					}
 				});
-		mDrawerListView.setAdapter(new ArrayAdapter<String>(getActionBar()
-				.getThemedContext(), R.layout.row_nav_item,
-				R.id.txtNavItem, new String[] {
-						getString(R.string.nav_nearby),
-						getString(R.string.nav_add),
-						getString(R.string.nav_feedback), }));
+		
+		navigationAdapter = new NavigationAdapter(getActivity());
+		List<String> items = new ArrayList<String>();
+		items.add(getString(R.string.nav_nearby));
+		items.add(getString(R.string.nav_add));
+		items.add(getString(R.string.nav_feedback));
+		navigationAdapter.setNavigationItems(items);
+		
+		mDrawerListView.setAdapter(navigationAdapter);
+		
 		mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 		return mDrawerListView;
 	}

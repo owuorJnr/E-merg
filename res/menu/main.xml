@@ -13,5 +13,10 @@
         android:id="@+id/action_about"
         android:title="@string/action_about"
         app:showAsAction="never"/>
+    
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/action_share"
+        app:showAsAction="never"/>
 
 </menu>

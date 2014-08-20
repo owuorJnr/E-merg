@@ -5,11 +5,21 @@ public class Center {
 	 private String name;
      private double lat;
      private double lon;
+     
+     private String phone1;
+     private String phone2;
+     private String phone3;
+     private String services;
+     
 
-     public Center(String name,double lat,double lon){
+     public Center(String name,double lat,double lon,String phone1,String phone2,String phone3,String services){
          this.name = name;
          this.lat = lat;
          this.lon = lon;
+         this.phone1 = phone1;
+         this.phone2 = phone2;
+         this.phone3 = phone3;
+         this.services = services;
      }
 
      public String getName(){
@@ -22,6 +32,22 @@ public class Center {
 
      public double getLon(){
          return lon;
+     }
+     
+     public String getPhone1(){
+         return phone1;
+     }
+     
+     public String getPhone2(){
+         return phone2;
+     }
+     
+     public String getPhone3(){
+         return phone3;
+     }
+     
+     public String getServices(){
+         return services;
      }
 	
 }

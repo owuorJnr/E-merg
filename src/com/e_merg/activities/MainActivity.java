@@ -47,32 +47,28 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments
-		switch(position){
-		case 0:
+		if(position == 0){
 			//Nearby Centers
 			getSupportFragmentManager().beginTransaction()
 			.replace(R.id.container, new NearbyFragment(),"Nearby Fragment")
 			.commit();
-			break;
-		case 1:
+			
+		}else if(position == 1){
 			//Add a Center
 			getSupportFragmentManager().beginTransaction()
 			.replace(R.id.container, new AddCenterFragment(),"AddCenter Fragment")
 			.commit();
-			break;
 			
-		case 2:
+		}else if(position == 2){
 			//Feedback
 			
 			Intent mail = new Intent(Intent.ACTION_SEND);
-            mail.putExtra(Intent.EXTRA_EMAIL, new String[]{"dickytea@gmail.com","patweru@gmail.com"});
+            mail.putExtra(Intent.EXTRA_EMAIL, new String[]{"dickytea@gmail.com","patweru@gmail.com","nenokirui@gmail.com"});
             mail.setType("message/rfc822");
             startActivity(Intent.createChooser(mail,"choose email service"));
-			
-			break;
-		default:
-				
+					
 		}
+		
 	}
 
 
@@ -112,6 +108,19 @@ public class MainActivity extends ActionBarActivity implements
 			getSupportFragmentManager().beginTransaction()
 			.replace(R.id.container, new NearbyMapFragment(),"Map Fragment")
 			.commit();
+			
+			return true;
+		}else if(id == R.id.action_share){
+			
+			String message = "Download E-merg from Google Play https://play.google.com/store/apps/details/?id=com.e_merg";
+			
+			//send as text
+			Intent shareIntent;
+			shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+			shareIntent.setType("text/plain");
+			startActivity(Intent.createChooser(shareIntent,"choose share service"));
 			
 			return true;
 		}
