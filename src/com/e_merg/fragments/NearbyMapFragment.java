@@ -144,8 +144,8 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
                         String lat = s.getString(TAG_LAT);
                         String lon = s.getString(TAG_LON);
 
-                        Center mallItem = new Center(name,Double.parseDouble(lat),Double.parseDouble(lon));
-                        centerList.add(mallItem);
+                        //Center mallItem = new Center(name,Double.parseDouble(lat),Double.parseDouble(lon));
+                       // centerList.add(mallItem);
 
 
 

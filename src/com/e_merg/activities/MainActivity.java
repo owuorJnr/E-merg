@@ -1,5 +1,7 @@
 package com.e_merg.activities;
 
+import java.lang.reflect.Field;
+
 import com.e_merg.fragments.AboutFragment;
 import com.e_merg.fragments.AddCenterFragment;
 import com.e_merg.fragments.NavigationDrawerFragment;
@@ -12,8 +14,10 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewConfiguration;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -42,6 +46,22 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+		
+		// Force show overflow menu, if this is left as the default then
+        //the overflow menu items will be attached to the hardware button for menu
+          try {
+                  ViewConfiguration config = ViewConfiguration.get(this);
+                  //field is of type java.lang.reflect.Field 
+                  Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+                  if(menuKeyField != null) {
+                      menuKeyField.setAccessible(true);
+                      menuKeyField.setBoolean(config, false);
+                  }
+              } catch (Exception e) {
+                  // you can choose to display the exception
+            	  Log.e("MainActivity: Overflow Not Set",e.toString());
+              }
+		
 	}
 
 	@Override
