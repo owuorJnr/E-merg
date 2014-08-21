@@ -7,10 +7,12 @@ import com.e_merg.fragments.AddCenterFragment;
 import com.e_merg.fragments.NavigationDrawerFragment;
 import com.e_merg.fragments.NearbyFragment;
 import com.e_merg.fragments.NearbyMapFragment;
+import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.R;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -20,7 +22,7 @@ import android.view.MenuItem;
 import android.view.ViewConfiguration;
 
 public class MainActivity extends ActionBarActivity implements
-		NavigationDrawerFragment.NavigationDrawerCallbacks {
+		NavigationDrawerFragment.NavigationDrawerCallbacks,OnChangeFragmentListener {
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -145,6 +147,14 @@ public class MainActivity extends ActionBarActivity implements
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onChangeFragment(Fragment fragment) {
+		// TODO Auto-generated method stub
+		getSupportFragmentManager().beginTransaction()
+		.replace(R.id.container, fragment,"New Fragment")
+		.commit();
 	}
 
 

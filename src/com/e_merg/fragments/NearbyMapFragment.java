@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationManager;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.e_merg.R;
+import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.OnMapClickListener{
 
+	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
     //Geocoder geocoder;
 
@@ -78,6 +81,23 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
         map.setOnMapClickListener(this);*/
     }
 
+    @Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		try {
+            fragmentListener = (OnChangeFragmentListener)activity;
+        }catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener");
+        }
+	}
+    
+    @Override
+	public void onDetach() {
+		// TODO Auto-generated method stub
+		fragmentListener = null;
+		super.onDetach();
+	}
 
     @Override
     public void onMapClick(LatLng latLng) {

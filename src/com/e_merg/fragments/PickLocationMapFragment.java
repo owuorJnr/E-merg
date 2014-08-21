@@ -1,10 +1,12 @@
 package com.e_merg.fragments;
 
+import android.app.Activity;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 
 import com.e_merg.R;
+import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -14,6 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PickLocationMapFragment extends SupportMapFragment{
 
+	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
     //Geocoder geocoder;
 
@@ -48,5 +51,23 @@ public class PickLocationMapFragment extends SupportMapFragment{
 
     }
 
+    @Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		try {
+            fragmentListener = (OnChangeFragmentListener)activity;
+        }catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener");
+        }
+	}
+    
+    @Override
+	public void onDetach() {
+		// TODO Auto-generated method stub
+		fragmentListener = null;
+		super.onDetach();
+	}
+    
 
 }//END OF CLASS PickLocationMapFragment
