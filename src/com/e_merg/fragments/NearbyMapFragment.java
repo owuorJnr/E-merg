@@ -46,6 +46,8 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
     private static String TAG_NAME = "name";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
+    
+    private static LatLng ME;
 
     ArrayList<Center> centerList;
     JSONArray centers = null;
@@ -55,7 +57,7 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
-        /*map = this.getMap();
+        map = getMap();
    		map.setMyLocationEnabled(true);
         //geocoder = new Geocoder(getActivity());
 
@@ -64,21 +66,27 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
         //new GetCenters().execute();
 
         Location location = map.getMyLocation();
+        
+        if(location == null){
+        	ME = new LatLng(-1.308987, 36.812712);
+        }else{
+        	ME = new LatLng(location.getLatitude(),location.getLongitude());
+        }
 
         map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(),location.getLongitude()))
+                .position(ME)
                 .title("Me")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
 
 
         // Move the camera instantly to sbs with a zoom of 15.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 15));
 
         // Zoom in, animating the camera.
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
 
-        map.setOnMapClickListener(this);*/
+        map.setOnMapClickListener(this);
     }
 
     @Override

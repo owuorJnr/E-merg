@@ -2,6 +2,7 @@ package com.e_merg.adapters;
 
 import java.util.List;
 
+import com.e_merg.R;
 import com.e_merg.types.Center;
 
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 public class CenterAdapter extends ArrayAdapter<Center> {
 
@@ -32,28 +34,28 @@ public class CenterAdapter extends ArrayAdapter<Center> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		/*ViewHolder holder;
+		ViewHolder holder;
 		if (convertView == null) {
-			convertView = layoutInflater.inflate(R.layout.row_condition, null);
+			convertView = layoutInflater.inflate(R.layout.row_center, null);
 			holder = new ViewHolder();
 			
-			holder.condition = (TextView) convertView.findViewById(R.id.txtConditionName);
-			holder.desc = (TextView) convertView.findViewById(R.id.txtDesc);
-			holder.rTag = (TextView) convertView.findViewById(R.id.txtRelatedTag);
+			holder.name = (TextView) convertView.findViewById(R.id.txtName);
+			holder.services = (TextView) convertView.findViewById(R.id.txtServices);
+			//holder.rTag = (TextView) convertView.findViewById(R.id.txtRelatedTag);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		Condition cond = getItem(position);
-		holder.condition.setText(cond.getName());
-		holder.desc.setText(cond.getDesc());
-		holder.rTag.setText("");*/
+		Center center = getItem(position);
+		holder.name.setText(center.getName());
+		holder.services.setText(center.getServices());
+		//holder.rTag.setText("");
 		
 		return convertView;
 	}// end of method getView()
 
 	static class ViewHolder {
-		//TextView condition, desc, rTag;
+		TextView name,services;
 	}
 }//END OF CLASS CenterAdapter
