@@ -3,21 +3,21 @@ package com.e_merg.fragments;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.e_merg.R;
 import com.e_merg.interfaces.OnChangeFragmentListener;
+import com.e_merg.services.GPSTracker;
 import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,9 +31,7 @@ public class NearbyMapFragment extends SupportMapFragment{
 
 	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
-    //Geocoder geocoder;
-
-    LocationManager locationManager;
+    GPSTracker gpsTracker;
 
     private ProgressDialog pDialog;
 
@@ -41,6 +39,7 @@ public class NearbyMapFragment extends SupportMapFragment{
     private static String url = "http://www.sharemiale.info.ke/emerg_api/index.php";
 
     //JSON Node Names
+    private static final String TAG_REQ = "get-centers";
     private static String TAG_SUCCESS = "success";
     private static String TAG_SUCCESS_MSG = "success_msg";
     private static String TAG_ERROR = "error";
@@ -51,6 +50,7 @@ public class NearbyMapFragment extends SupportMapFragment{
     private static String TAG_LON = "lon";
     
     private static LatLng ME;
+	private int radius;
 
     List<Center> listCenters;
     JSONArray centers = null;
@@ -60,22 +60,21 @@ public class NearbyMapFragment extends SupportMapFragment{
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
+        radius = 50;
         map = getMap();
-   		map.setMyLocationEnabled(true);
-        //geocoder = new Geocoder(getActivity());
-
-   		listCenters = new ArrayList<Center>();
-
-        Location location = map.getMyLocation();
+        listCenters = new ArrayList<Center>();
+        gpsTracker = new GPSTracker(getActivity());
         
-        if(location == null){
-        	ME = new LatLng(-1.308987, 36.812712);
+        if(gpsTracker.canGetLocation()){
+        	
+        	ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+        	new GetCenterLocations().execute();
         }else{
-        	ME = new LatLng(location.getLatitude(),location.getLongitude());
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gpsTracker.showSettingsAlert();
         }
-
-        new GetCenterLocations().execute();
-
     }
 
     @Override
@@ -117,8 +116,14 @@ public class NearbyMapFragment extends SupportMapFragment{
             //Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
 
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair("req", TAG_REQ));
+            nameValuePairs.add(new BasicNameValuePair("lat", String.valueOf(ME.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(ME.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("radius", String.valueOf(radius)));
+            
             //Making a request to url and getting response
-            String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST);
+            String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST,nameValuePairs);
 
             //shows the response gotten from the http request
             Log.d("Response: "," > "+jsonStr);
@@ -148,7 +153,6 @@ public class NearbyMapFragment extends SupportMapFragment{
 	                        String category = "";//s.getString(TAG_LON);
 	                        */
 	                        
-	                        listCenters = new ArrayList<Center>();
 	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,detail);
 	                		listCenters.add(center);
 	
@@ -191,13 +195,14 @@ public class NearbyMapFragment extends SupportMapFragment{
                 for(int i=0;i<listCenters.size();i++){
                     Center center= listCenters.get(i);
                     map.addMarker(new MarkerOptions().position(new LatLng(center.getLat(),center.getLon()))
-                            .title(center.getName()));
+                            .title(center.getName())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                 }
 
                 map.addMarker(new MarkerOptions()
                 .position(ME)
                 .title("Me")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
 
                 // Move the camera instantly to sbs with a zoom of 15.

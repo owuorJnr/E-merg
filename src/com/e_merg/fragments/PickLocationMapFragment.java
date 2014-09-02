@@ -1,12 +1,13 @@
 package com.e_merg.fragments;
 
 import android.app.Activity;
-import android.location.Location;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.location.LocationManager;
 import android.os.Bundle;
 
-import com.e_merg.R;
 import com.e_merg.interfaces.OnChangeFragmentListener;
+import com.e_merg.services.GPSTracker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -19,7 +20,7 @@ public class PickLocationMapFragment extends SupportMapFragment implements OnMap
 
 	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
-    //Geocoder geocoder;
+    GPSTracker gpsTracker;
 
     LocationManager locationManager;
 
@@ -29,24 +30,31 @@ public class PickLocationMapFragment extends SupportMapFragment implements OnMap
         super.onActivityCreated(savedInstanceState);
 
         map = this.getMap();
-   		map.setMyLocationEnabled(true);
-        //geocoder = new Geocoder(getActivity());
-
-        Location location = map.getMyLocation();
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(),location.getLongitude()))
-                .title("Me")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
-
-
-        // Move the camera instantly to sbs with a zoom of 15.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 15));
-
-        // Zoom in, animating the camera.
-        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        gpsTracker = new GPSTracker(getActivity());
         
-        map.setOnMapClickListener(this);
+        if(gpsTracker.canGetLocation()){
+        	
+        	LatLng ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+        	
+	        map.addMarker(new MarkerOptions()
+	                .position(ME)
+	                .title("Me")
+	                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+	
+	
+	        // Move the camera instantly to current location with a zoom of 1000.
+	        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 1000));
+	
+	        // Zoom in, animating the camera.
+	        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+	        map.setOnMapClickListener(this);
+        
+        }else{
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gpsTracker.showSettingsAlert();
+        }
 
     }
 
@@ -69,11 +77,34 @@ public class PickLocationMapFragment extends SupportMapFragment implements OnMap
 	}
 
 	@Override
-	public void onMapClick(LatLng coord) {
+	public void onMapClick(final LatLng coord) {
 		// TODO Auto-generated method stub
-		AddCenterFragment addCenterFragment = new AddCenterFragment();
-		addCenterFragment.setLocation(coord);
-		fragmentListener.onChangeFragment(addCenterFragment);
+		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+		alertBuilder.setTitle("Pick This Location");
+		alertBuilder.setMessage("You are sure you want to pick this location?");
+		alertBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				AddCenterFragment addCenterFragment = new AddCenterFragment();
+				addCenterFragment.setLocation(coord);
+				dialog.cancel();
+				fragmentListener.onChangeFragment(addCenterFragment);
+			}
+			
+		});
+		
+		alertBuilder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+			
+		});
+		alertBuilder.create().show();
 	}
     
     

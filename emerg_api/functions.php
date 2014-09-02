@@ -48,7 +48,7 @@
 		function add_center($name,$lat,$lon,$email,$phone1,$phone2,$phone3)
 		{
 
-			if($name == "" || $lat=="" || $lon=="" || $email=="" || $phone1=="" || $phone2=="" || $phone3==""){
+			if($name == "" || $lat=="" || $lon=="" || $phone1==""){
 
 				$this->response["error"] = 1;
 				$this->response["error_msg"] = "Some values empty!";
@@ -57,7 +57,7 @@
 
 				$alreadyAdded = $this->check_location($lat,$lon);
 
-				if($alreadyAdded === FALSE){
+				if($alreadyAdded == FALSE){
 					//generate center_no
 					$center_no = uniqid('cntr.');
 					$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$lat','$lon','$email',NOW())";
@@ -130,10 +130,16 @@
 
 
 
-		function get_centers()
+		function get_centers($lat,$lon,$radius)
 		{
 			
-			$query = "SELECT * FROM tbl_emerg_centers";
+			//$radius = 0.2;
+			$query = "SELECT *, ( 6371 * acos( cos( radians({$lat}) ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LON` ) - radians({$lon}) ) + sin( radians({$lat}) ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= {$radius} ORDER BY distance ASC";
+
+			/*$query = "SELECT *, ( 6371 * acos( cos( radians('$lat') ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LAT` ) - radians('$lon') ) + sin( radians('$lat') ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= '$radius' ORDER BY distance ASC";*/
+
+
+			//$query = "SELECT * FROM tbl_emerg_centers";
 			$result = mysql_query($query) or die(mysql_error());
 			if(mysql_affected_rows() > 0){
 
@@ -155,7 +161,7 @@
 			}else{
 
 				$this->response["error"] = 1;
-				$this->response["error_msg"] = "Services not added!";
+				$this->response["error_msg"] = "No centers found!";
 			}
 
 			return json_encode($this->response);
@@ -165,12 +171,16 @@
 
 		private function check_location($lat,$lon)
 		{
+			$radius = 1;
+			$query = "SELECT *, ( 6371 * acos( cos( radians({$lat}) ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LON` ) - radians({$lon}) ) + sin( radians({$lat}) ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= $radius ORDER BY distance ASC";
 
-			$query = "SELECT * FROM tbl_emerg_centers WHERE LOC_LAT = '$lat' AND LOC_LON='$lon'";
+			//$query = "SELECT * FROM tbl_emerg_centers WHERE LOC_LAT = '$lat' AND LOC_LON='$lon'";
 			$result = mysql_query($query) or die(mysql_error());
-			if(mysql_affected_rows() > 0){
+			if(mysql_num_rows($result) > 0){
+				
 				return TRUE;
 			}else{
+				
 				return FALSE;
 			}
 		}//end of function

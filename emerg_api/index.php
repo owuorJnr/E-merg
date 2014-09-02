@@ -20,6 +20,11 @@
 			//echo $emerg->add_services()."<br>";
 			//echo $emerg->get_centers()."<br>";
 		
+		/*}else if($req == "check-location"){
+
+			$lat = filter_input(INPUT_POST, 'lat', FILTER_SANITIZE_STRING);
+			$lon = filter_input(INPUT_POST, 'lon', FILTER_SANITIZE_STRING);*/
+
 		}else if($req == "add-center"){
 			
 			$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
@@ -37,14 +42,17 @@
 			//center-no
 			//service(s)
 			$center_no = filter_input(INPUT_POST, 'center_no', FILTER_SANITIZE_STRING);
-			$service = filter_input(INPUT_POST, 'service', FILTER_SANITIZE_STRING);
+			$service = filter_input(INPUT_POST, 'services', FILTER_SANITIZE_STRING);
 
 			echo $emerg->add_services($center_no,$service);
 
 		}else if($req == "get-centers"){
 			//radius or current position (lat, lon)
+			$lat = filter_input(INPUT_POST, 'lat', FILTER_SANITIZE_STRING);
+			$lon = filter_input(INPUT_POST, 'lon', FILTER_SANITIZE_STRING);
+			$radius = filter_input(INPUT_POST, 'radius', FILTER_SANITIZE_STRING);
 
-			echo $emerg->get_centers();
+			echo $emerg->get_centers($lat,$lon,$radius);
 
 		}else{
 		
@@ -57,7 +65,15 @@
 	
 		$response =   array("success" => 0, "error" => 1, "error_msg" => "Access Denied");
 		//print_r($response);
-		echo json_encode($response);
+
+		require_once("functions.php");
+		$emerg = new FUNCTIONS("test");
+		$lat = "-1.300170357823578";
+		$lon = "36.807733699679375";
+		echo $emerg->add_center("KNH2",$lat,$lon,"email","755","","");
+		//echo $emerg->get_centers($lat,$lon,"50");
+		//echo json_encode($response);
+
 	}
 
 

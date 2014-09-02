@@ -162,8 +162,7 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
 			phone2 = editPhone2.getText().toString().trim();
 			phone3 = editPhone3.getText().toString().trim();
 			
-			if(name.equalsIgnoreCase("") || email.equalsIgnoreCase("") || 
-					phone1.equalsIgnoreCase("")){
+			if(name.equalsIgnoreCase("") || phone1.equalsIgnoreCase("")){
 				
 				Toast.makeText(getActivity(), "Enter name, category, email and atleast phone1", Toast.LENGTH_SHORT).show();
 				
@@ -231,7 +230,8 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
 	                        String lon = s.getString(TAG_LON);
 	
 	                    }*/
-	                    MainActivity.currentCenterNo = jsonObj.getString(TAG_CENTER_NO);;
+	                    MainActivity.currentCenterNo = jsonObj.getString(TAG_CENTER_NO);
+	                    
 	
 	                    return jsonObj.getString(TAG_SUCCESS_MSG);
             	}else{

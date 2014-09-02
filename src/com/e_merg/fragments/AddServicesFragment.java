@@ -44,7 +44,7 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
     private static String TAG_SUCCESS_MSG = "success_msg";
     private static String TAG_ERROR = "error";
     private static String TAG_ERROR_MSG = "error_msg";
-	private static final String TAG_REQ = "add-service";
+	private static final String TAG_REQ = "add-services";
 	
 	private String services;//,other;
 	
@@ -98,13 +98,13 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
 			
 		}else if(v == btnFinish){
 			//pick services and send online
-			String services = (String) spServices.getSelectedItem();
+			String services = spServices.getSelectedItem().toString();
 			services = services.concat(","+editOther.getText().toString().trim());
 			
 			if(services.equalsIgnoreCase(",")){
-				new AddCenterService().execute();
+				Toast.makeText(getActivity(), "Enter Service", Toast.LENGTH_SHORT).show();		
 			}else{
-				Toast.makeText(getActivity(), "Enter Service", Toast.LENGTH_SHORT).show();
+				new AddCenterService().execute();
 			}
 			//fragmentListener.onChangeFragment(new NearbyFragment());
 		}
@@ -132,12 +132,14 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
             
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair("req", TAG_REQ));
-            nameValuePairs.add(new BasicNameValuePair("center-no", MainActivity.currentCenterNo));
+            nameValuePairs.add(new BasicNameValuePair("center_no", MainActivity.currentCenterNo));
             nameValuePairs.add(new BasicNameValuePair("services", services));
             
             //Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST,nameValuePairs);
 
+            Log.d("Center Number"," > "+MainActivity.currentCenterNo);
+            Log.d("Services"," > "+services);
             //shows the response gotten from the http request
             Log.d("Response: "," > "+jsonStr);
 

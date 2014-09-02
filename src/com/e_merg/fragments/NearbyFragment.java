@@ -24,12 +24,15 @@ import android.widget.Toast;
 import com.e_merg.R;
 import com.e_merg.adapters.CenterAdapter;
 import com.e_merg.interfaces.OnChangeFragmentListener;
+import com.e_merg.services.GPSTracker;
 import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.model.LatLng;
 
 public class NearbyFragment extends ListFragment{
 
+	GPSTracker gpsTracker;
+	
 	OnChangeFragmentListener fragmentListener;
 	ListView listView;
 	CenterAdapter centerAdapter;
@@ -65,15 +68,25 @@ public class NearbyFragment extends ListFragment{
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		
-		radius = 1;
-		
+		radius = 50;
 		listView = getListView();
-		
-		new GetCenterList().execute();
-		
-		
-		/*listCenters = new ArrayList<Center>();
-		Center center;
+		listCenters = new ArrayList<Center>();
+			
+		gpsTracker = new GPSTracker(getActivity());
+        
+        if(gpsTracker.canGetLocation()){
+        	
+        	currentCoordinates = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+        	new GetCenterList().execute();
+        }else{
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+        	currentCoordinates = new LatLng(0,0);
+            gpsTracker.showSettingsAlert();
+        }
+	
+		/*Center center;
 		center = new Center("Strathmore Clinic", 0, 0, "0728558822", "0727775712","037129012", "Out-Patient Services");
 		listCenters.add(center);*/
 	}
@@ -153,7 +166,6 @@ public class NearbyFragment extends ListFragment{
 	                        String category = "";//s.getString(TAG_LON);
 	                        */
 	                        
-	                        listCenters = new ArrayList<Center>();
 	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,detail);
 	                		listCenters.add(center);
 	
