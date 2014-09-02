@@ -2,14 +2,6 @@ package com.e_merg.activities;
 
 import java.lang.reflect.Field;
 
-import com.e_merg.fragments.AboutFragment;
-import com.e_merg.fragments.AddCenterFragment;
-import com.e_merg.fragments.NavigationDrawerFragment;
-import com.e_merg.fragments.NearbyFragment;
-import com.e_merg.fragments.NearbyMapFragment;
-import com.e_merg.interfaces.OnChangeFragmentListener;
-import com.e_merg.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +12,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
+
+import com.e_merg.R;
+import com.e_merg.fragments.AboutFragment;
+import com.e_merg.fragments.NavigationDrawerFragment;
+import com.e_merg.fragments.NearbyFragment;
+import com.e_merg.fragments.NearbyMapFragment;
+import com.e_merg.fragments.PickLocationMapFragment;
+import com.e_merg.interfaces.OnChangeFragmentListener;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks,OnChangeFragmentListener {
@@ -36,6 +36,8 @@ public class MainActivity extends ActionBarActivity implements
 	 */
 	private CharSequence mTitle;
 
+	public static String currentCenterNo;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,20 +52,24 @@ public class MainActivity extends ActionBarActivity implements
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 		
 		// Force show overflow menu, if this is left as the default then
-        //the overflow menu items will be attached to the hardware button for menu
-          try {
-                  ViewConfiguration config = ViewConfiguration.get(this);
-                  //field is of type java.lang.reflect.Field 
-                  Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-                  if(menuKeyField != null) {
-                      menuKeyField.setAccessible(true);
-                      menuKeyField.setBoolean(config, false);
-                  }
-              } catch (Exception e) {
-                  // you can choose to display the exception
-            	  Log.e("MainActivity: Overflow Not Set",e.toString());
-              }
-		
+		// the overflow menu items will be attached to the hardware button for
+		// menu
+		try {
+			ViewConfiguration config = ViewConfiguration.get(this);
+			// field is of type java.lang.reflect.Field
+			Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKeyField != null) {
+				menuKeyField.setAccessible(true);
+				menuKeyField.setBoolean(config, false);
+			}
+		} catch (Exception e) {
+			// you can choose to display the exception
+			Log.e("MainActivity: Overflow Not Set", e.toString());
+		}
+
+		if (savedInstanceState == null) {
+			currentCenterNo = "";
+		}
 	}
 
 	@Override
@@ -78,7 +84,7 @@ public class MainActivity extends ActionBarActivity implements
 		}else if(position == 1){
 			//Add a Center
 			getSupportFragmentManager().beginTransaction()
-			.replace(R.id.container, new AddCenterFragment(),"AddCenter Fragment")
+			.replace(R.id.container, new PickLocationMapFragment(),"PickLocationMapFragment Fragment")
 			.commit();
 			
 		}else if(position == 2){

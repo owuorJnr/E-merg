@@ -9,22 +9,19 @@ import com.e_merg.R;
 import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class PickLocationMapFragment extends SupportMapFragment{
+public class PickLocationMapFragment extends SupportMapFragment implements OnMapClickListener{
 
 	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
     //Geocoder geocoder;
 
     LocationManager locationManager;
-
-    //URL to get contacts JSON
-    //private static String url = "http://10.0.2.2/mti_shopping/malls.php";
-    private static String url = "http://www.sharemiale.info.ke/emerg_api/index.php";
 
 
     @Override
@@ -48,6 +45,8 @@ public class PickLocationMapFragment extends SupportMapFragment{
 
         // Zoom in, animating the camera.
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        
+        map.setOnMapClickListener(this);
 
     }
 
@@ -68,6 +67,14 @@ public class PickLocationMapFragment extends SupportMapFragment{
 		fragmentListener = null;
 		super.onDetach();
 	}
-    
 
+	@Override
+	public void onMapClick(LatLng coord) {
+		// TODO Auto-generated method stub
+		AddCenterFragment addCenterFragment = new AddCenterFragment();
+		addCenterFragment.setLocation(coord);
+		fragmentListener.onChangeFragment(addCenterFragment);
+	}
+    
+    
 }//END OF CLASS PickLocationMapFragment

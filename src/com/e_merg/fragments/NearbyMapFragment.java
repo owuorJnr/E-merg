@@ -1,6 +1,7 @@
 package com.e_merg.fragments;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +27,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.OnMapClickListener{
+public class NearbyMapFragment extends SupportMapFragment{
 
 	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
@@ -37,19 +38,21 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
     private ProgressDialog pDialog;
 
     //URL to get contacts JSON
-    //private static String url = "http://10.0.2.2/mti_shopping/malls.php";
     private static String url = "http://www.sharemiale.info.ke/emerg_api/index.php";
 
     //JSON Node Names
+    private static String TAG_SUCCESS = "success";
+    private static String TAG_SUCCESS_MSG = "success_msg";
+    private static String TAG_ERROR = "error";
+    private static String TAG_ERROR_MSG = "error_msg";
     private static String TAG_CENTERS = "centers";
-    //private static String TAG_ID = "id";
     private static String TAG_NAME = "name";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
     
     private static LatLng ME;
 
-    ArrayList<Center> centerList;
+    List<Center> listCenters;
     JSONArray centers = null;
 
 
@@ -61,9 +64,7 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
    		map.setMyLocationEnabled(true);
         //geocoder = new Geocoder(getActivity());
 
-   		centerList = new ArrayList<Center>();
-
-        //new GetCenters().execute();
+   		listCenters = new ArrayList<Center>();
 
         Location location = map.getMyLocation();
         
@@ -73,20 +74,8 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
         	ME = new LatLng(location.getLatitude(),location.getLongitude());
         }
 
-        map.addMarker(new MarkerOptions()
-                .position(ME)
-                .title("Me")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
+        new GetCenterLocations().execute();
 
-
-        // Move the camera instantly to sbs with a zoom of 15.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 15));
-
-        // Zoom in, animating the camera.
-        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-
-
-        map.setOnMapClickListener(this);
     }
 
     @Override
@@ -107,31 +96,9 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
 		super.onDetach();
 	}
 
-    @Override
-    public void onMapClick(LatLng latLng) {
-
-        //Marker pos = map.
-        try {
-            /*List<Address> addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 10);
-
-            String address = "";
-            for(int i=0;i<addressList.size();i++){
-                address = address.concat(addressList.get(i).getAddressLine(0)+"\n"+
-                        "Feature Name: "+ addressList.get(i).getFeatureName()+"\n"+
-                        "Premises: "+addressList.get(i).getPremises()+"\n");
-            }
-
-            Toast.makeText(getActivity(), address, Toast.LENGTH_SHORT).show();
-
-            Log.d("Address",address);*/
-
-        }catch (Exception e){
-
-        }
-    }
 
 
-    private class GetCenters extends AsyncTask<String, String, String> {
+    private class GetCenterLocations extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPreExecute(){
@@ -159,27 +126,43 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
             if(jsonStr != null){
 
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-
-                    centers = jsonObj.getJSONArray(TAG_CENTERS);
-
-                    //looping through all items
-                    for(int i=0;i<centers.length();i++){
-                        JSONObject s = centers.getJSONObject(i);
-
-                        //String id = s.getString(TAG_ID);
-                        String name = s.getString(TAG_NAME);
-                        String lat = s.getString(TAG_LAT);
-                        String lon = s.getString(TAG_LON);
-
-                        //Center mallItem = new Center(name,Double.parseDouble(lat),Double.parseDouble(lon));
-                       // centerList.add(mallItem);
-
-
-
-                    }
-
-                    return "Centers Found";
+	                JSONObject jsonObj = new JSONObject(jsonStr);
+	                String success = jsonObj.getString(TAG_SUCCESS);
+	                if(success != null && success.equalsIgnoreCase("1")){   
+	                    centers = jsonObj.getJSONArray(TAG_CENTERS);
+	            		Center center;
+	            		
+	                    //looping through all items
+	                    for(int i=0;i<centers.length();i++){
+	                        JSONObject s = centers.getJSONObject(i);
+	
+	                        //String id = s.getString(TAG_ID);
+	                        String name = s.getString(TAG_NAME);
+	                        String lat = s.getString(TAG_LAT);
+	                        String lon = s.getString(TAG_LON);
+	                        String phone1 = "";//s.getString(TAG_NAME);
+	                        String phone2 = "";//s.getString(TAG_LAT);
+	                        String phone3 = "";//s.getString(TAG_LON);
+	                        String detail = "";//s.getString(TAG_LAT);
+	                        /*String email = "";//s.getString(TAG_NAME);
+	                        String category = "";//s.getString(TAG_LON);
+	                        */
+	                        
+	                        listCenters = new ArrayList<Center>();
+	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,detail);
+	                		listCenters.add(center);
+	
+	                    }
+	
+	                    return jsonObj.getString(TAG_SUCCESS_MSG);
+                	}else{
+                		String error = jsonObj.getString(TAG_ERROR);
+                		if(error != null && error.equalsIgnoreCase("1")){  
+                			return jsonObj.getString(TAG_ERROR_MSG);
+                		}else{
+                			return "";
+                		}
+                	}
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -205,16 +188,22 @@ public class NearbyMapFragment extends SupportMapFragment implements GoogleMap.O
             if(!result.equalsIgnoreCase("")){
 
                 //add markers
-                for(int i=0;i<centerList.size();i++){
-                    Center center= centerList.get(i);
+                for(int i=0;i<listCenters.size();i++){
+                    Center center= listCenters.get(i);
                     map.addMarker(new MarkerOptions().position(new LatLng(center.getLat(),center.getLon()))
                             .title(center.getName()));
                 }
 
-                // Move the camera instantly to sbs with a zoom of 15.
-                //map.moveCamera(CameraUpdateFactory.newLatLngZoom(SBS, 15));
+                map.addMarker(new MarkerOptions()
+                .position(ME)
+                .title("Me")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)));
 
-                // Zoom in, animating the camera.
+
+                // Move the camera instantly to sbs with a zoom of 15.
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 15));
+
+        		// Zoom in, animating the camera.
                 map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
             }else{

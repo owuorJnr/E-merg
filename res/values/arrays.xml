@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="array_services">
-        <item>Hospital</item>
-        <item>Clinic</item>
+    <string-array name="array_category">
         <item>Ambulance</item>
+        <item>Fire Station</item>
+        <item>Medical</item>
         <item>Police Station</item>
+        <item>Other</item>
     </string-array>
+ 
+    <string-array name="array_services">
+        <item>Out-patient</item>
+        <item>In-patient</item>
+        <item>Maternity</item>
+        <item>Security</item>
+    </string-array>
+    
 </resources>
