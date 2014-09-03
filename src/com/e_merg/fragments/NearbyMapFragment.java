@@ -78,16 +78,22 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
         listCenters = new ArrayList<Center>();
         gpsTracker = new GPSTracker(getActivity());
         
-        if(gpsTracker.canGetLocation()){
+        if(gpsTracker.hasInternetConnection()){
         	
-        	ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
-        	new GetCenterLocations().execute();
+        	if(gpsTracker.canGetLocation()){
+            	
+            	ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+            	new GetCenterLocations().execute();
+            }else{
+                // can't get location
+                // GPS or Network is not enabled
+                // Ask user to enable GPS/network in settings
+                gpsTracker.showSettingsAlert();
+            }
         }else{
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gpsTracker.showSettingsAlert();
+        	Toast.makeText(getActivity(), "No Internet Connection!", Toast.LENGTH_SHORT).show();
         }
+  
         
         map.setOnMarkerClickListener(this);;
     }
@@ -174,7 +180,7 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair("req", TAG_REQ));
             nameValuePairs.add(new BasicNameValuePair("lat", String.valueOf(ME.latitude)));
-            nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(ME.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(ME.longitude)));
             nameValuePairs.add(new BasicNameValuePair("radius", String.valueOf(radius)));
             
             //Making a request to url and getting response
@@ -271,7 +277,7 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
                 map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
 
             }else{
-                Toast.makeText(getActivity(), "No emergency center(s) Found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Error fetching emergency center(s)", Toast.LENGTH_SHORT).show();
             }
 
         }

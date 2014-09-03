@@ -273,7 +273,8 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
             }
 
 
-            if(!result.equalsIgnoreCase("")){
+            if(!result.equalsIgnoreCase("") && result.equalsIgnoreCase("Center added")){
+            	Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
             	fragmentListener.onChangeFragment(new AddServicesFragment());
             	
             }else{

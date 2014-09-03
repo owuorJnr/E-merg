@@ -10,7 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -85,17 +87,25 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 			
 		gpsTracker = new GPSTracker(getActivity());
         
-        if(gpsTracker.canGetLocation()){
-        	
-        	currentCoordinates = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
-        	new GetCenterList().execute();
-        }else{
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-        	currentCoordinates = new LatLng(0,0);
-            gpsTracker.showSettingsAlert();
-        }
+		 if(gpsTracker.hasInternetConnection()){
+	        	
+			if (gpsTracker.canGetLocation()) {
+
+				currentCoordinates = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+				new GetCenterList().execute();
+			} else {
+				// can't get location
+				// GPS or Network is not enabled
+				// Ask user to enable GPS/network in settings
+				// currentCoordinates = new LatLng(0,0);
+				gpsTracker.showSettingsAlert();
+			}
+	        		
+		} else {
+			Toast.makeText(getActivity(), "No Internet Connection!",
+					Toast.LENGTH_SHORT).show();
+		}
+		
 	
 		listView.setOnItemClickListener(this);
 	}
@@ -126,6 +136,39 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 		//call emergency number
 		Center center = (Center) listView.getItemAtPosition(position);
 		iMakeCall.makeCall(center.getPhone1());
+		
+		final String title = center.getName();
+    	AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+		alertBuilder.setTitle("Call Emergency");
+		alertBuilder.setMessage("Call "+title);
+		alertBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				
+				for(int i=0;i<listCenters.size();i++){
+					Center center = listCenters.get(i);
+					if(title.equalsIgnoreCase(center.getName())){
+						//call number
+						iMakeCall.makeCall(center.getPhone1());
+					}
+				}
+			}
+			
+		});
+		
+		alertBuilder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+			
+		});
+		alertBuilder.create().show();
+		
 	}
 	
 	private class GetCenterList extends AsyncTask<String, String, String> {
@@ -150,8 +193,10 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair("req", TAG_REQ));
             nameValuePairs.add(new BasicNameValuePair("lat", String.valueOf(currentCoordinates.latitude)));
-            nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(currentCoordinates.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("lon", String.valueOf(currentCoordinates.longitude)));
             nameValuePairs.add(new BasicNameValuePair("radius", String.valueOf(radius)));
+            
+           // Log.d("Resquest: "," > "+);
             
             //Making a request to url and getting response
             String jsonStr = sh.makeServiceCall(url, ServiceHandler.POST,nameValuePairs);
@@ -231,7 +276,7 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
         		listView.setAdapter(centerAdapter);
             	
             }else{
-                Toast.makeText(getActivity(), "No emergency center(s) Found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Error fetching emergency center(s)", Toast.LENGTH_SHORT).show();
             }
 
         }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.services.GPSTracker;
@@ -32,28 +33,34 @@ public class PickLocationMapFragment extends SupportMapFragment implements OnMap
         map = this.getMap();
         gpsTracker = new GPSTracker(getActivity());
         
-        if(gpsTracker.canGetLocation()){
+        if(gpsTracker.hasInternetConnection()){
         	
-        	LatLng ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
-        	
-	        map.addMarker(new MarkerOptions()
-	                .position(ME)
-	                .title("Me")
-	                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-	
-	
-	        // Move the camera instantly to current location with a zoom of 1000.
-	        map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 1000));
-	
-	        // Zoom in, animating the camera.
-	        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-	        map.setOnMapClickListener(this);
-        
+			if (gpsTracker.canGetLocation()) {
+
+				LatLng ME = new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+
+				map.addMarker(new MarkerOptions()
+						.position(ME)
+						.title("Me")
+						.icon(BitmapDescriptorFactory
+								.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+				// Move the camera instantly to current location with a zoom of
+				// 1000.
+				map.moveCamera(CameraUpdateFactory.newLatLngZoom(ME, 1000));
+
+				// Zoom in, animating the camera.
+				map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+				map.setOnMapClickListener(this);
+
+			} else {
+				// can't get location
+				// GPS or Network is not enabled
+				// Ask user to enable GPS/network in settings
+				gpsTracker.showSettingsAlert();
+			}
         }else{
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gpsTracker.showSettingsAlert();
+        	Toast.makeText(getActivity(), "No Internet Connection!", Toast.LENGTH_SHORT).show();
         }
 
     }

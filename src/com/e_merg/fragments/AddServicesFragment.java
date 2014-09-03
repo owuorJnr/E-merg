@@ -206,6 +206,7 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
 
 
             if(!result.equalsIgnoreCase("")){
+            	Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
             	fragmentListener.onChangeFragment(new NearbyFragment());
 
             }else{

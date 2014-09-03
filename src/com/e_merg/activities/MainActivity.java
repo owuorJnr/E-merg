@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import com.e_merg.fragments.NearbyMapFragment;
 import com.e_merg.fragments.PickLocationMapFragment;
 import com.e_merg.interfaces.IMakeCall;
 import com.e_merg.interfaces.OnChangeFragmentListener;
+import com.e_merg.services.GPSTracker;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks,OnChangeFragmentListener,IMakeCall {
@@ -43,6 +45,7 @@ public class MainActivity extends ActionBarActivity implements
 	private CharSequence mTitle;
 
 	public static String currentCenterNo;
+	private GPSTracker gpsTracker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +80,12 @@ public class MainActivity extends ActionBarActivity implements
 			currentCenterNo = "";
 		}
 		
+		gpsTracker = new GPSTracker(this,(ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE));
+		
 		EndCallListener callListener = new EndCallListener();
 		TelephonyManager mTM = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
 		mTM.listen(callListener, PhoneStateListener.LISTEN_CALL_STATE);
+		
 	}
 
 	@Override
@@ -92,10 +98,15 @@ public class MainActivity extends ActionBarActivity implements
 			.commit();
 			
 		}else if(position == 1){
-			//Add a Center
-			getSupportFragmentManager().beginTransaction()
-			.replace(R.id.container, new PickLocationMapFragment(),"PickLocationMapFragment Fragment")
-			.commit();
+			
+			if(gpsTracker.hasInternetConnection()){
+				//Add a Center
+				getSupportFragmentManager().beginTransaction()
+				.replace(R.id.container, new PickLocationMapFragment(),"PickLocationMapFragment Fragment")
+				.commit();
+			}else{
+				Toast.makeText(getBaseContext(), "No Interner Connection!", Toast.LENGTH_SHORT).show();
+			}
 			
 		}else if(position == 2){
 			//Feedback
@@ -142,10 +153,14 @@ public class MainActivity extends ActionBarActivity implements
 			return true;
 		}else if(id == R.id.action_map){
 			
-			//nearby centers in a map
-			getSupportFragmentManager().beginTransaction()
-			.replace(R.id.container, new NearbyMapFragment(),"Map Fragment")
-			.commit();
+			if(gpsTracker.hasInternetConnection()){
+				//nearby centers in a map
+				getSupportFragmentManager().beginTransaction()
+				.replace(R.id.container, new NearbyMapFragment(),"Map Fragment")
+				.commit();
+			}else{
+				Toast.makeText(getBaseContext(), "No Interner Connection!", Toast.LENGTH_SHORT).show();
+			}
 			
 			return true;
 		}else if(id == R.id.action_share){
@@ -177,8 +192,12 @@ public class MainActivity extends ActionBarActivity implements
 	public void makeCall(String number) {
 		// TODO Auto-generated method stub
 		if(!number.equalsIgnoreCase("")){
-			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
+			try{
+			Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(number));
 			startActivity(intent);
+			}catch(Exception e){
+				Log.e("MainActivity","Calling Error > "+ e.toString());
+			}
 		}else{
 			Toast.makeText(getBaseContext(), "No Verified Contact Found!", Toast.LENGTH_SHORT).show();
 		}

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.e_merg.R;
+import com.e_merg.activities.MainActivity;
 
 import android.app.AlertDialog;
 import android.app.Service;
@@ -16,6 +17,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -40,6 +43,8 @@ public class GPSTracker extends Service implements LocationListener
     boolean isNetworkEnabled = false;
 
     boolean canGetLocation = false;
+    
+    ConnectivityManager connection = null;
 
     Location location;
     double latitude;
@@ -54,9 +59,16 @@ public class GPSTracker extends Service implements LocationListener
     //Declaring a Location Manager
     protected LocationManager locationManager;
 
+    public GPSTracker(Context context,ConnectivityManager conn){
+    	this.mContext = context;
+        connection = conn;
+        //getLocation();
+    }
+    
     public GPSTracker(Context context) 
     {
         this.mContext = context;
+        connection = (ConnectivityManager) context.getSystemService(MainActivity.CONNECTIVITY_SERVICE);
         getLocation();
     }
 
@@ -181,6 +193,24 @@ public class GPSTracker extends Service implements LocationListener
     public boolean canGetLocation()
     {
         return this.canGetLocation;
+    }
+    
+    public boolean hasInternetConnection(){
+    	// method for testing Internet connection
+		// TODO Auto-generated method stub
+		if (connection != null) {
+			NetworkInfo[] info = connection.getAllNetworkInfo();
+			if (info != null) {
+				for (int i = 0; i < info.length; i++) {
+					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+						// Log.i("Network Operator", "connection available");
+						return connection.getActiveNetworkInfo().isConnected();
+					}
+				}// end of for-loop
+			}
+		}
+		Log.e("Network Operator", "no connection");
+		return false;
     }
 
     /**

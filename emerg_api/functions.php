@@ -134,6 +134,9 @@
 		{
 			
 			//$radius = 0.2;
+			//$lat = "-1.300170357823578";
+			//$lon = "36.807733699679375";
+
 			$query = "SELECT *, ( 6371 * acos( cos( radians({$lat}) ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LON` ) - radians({$lon}) ) + sin( radians({$lat}) ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= {$radius} ORDER BY distance ASC";
 
 			/*$query = "SELECT *, ( 6371 * acos( cos( radians('$lat') ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LAT` ) - radians('$lon') ) + sin( radians('$lat') ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= '$radius' ORDER BY distance ASC";*/
@@ -178,7 +181,7 @@
 
 		private function check_location($lat,$lon)
 		{
-			$radius = 1;
+			$radius = 0.1;
 			$query = "SELECT *, ( 6371 * acos( cos( radians({$lat}) ) * cos( radians( `LOC_LAT` ) ) * cos( radians( `LOC_LON` ) - radians({$lon}) ) + sin( radians({$lat}) ) * sin( radians( `LOC_LAT` ) ) ) ) AS distance FROM `tbl_emerg_centers` HAVING distance <= $radius ORDER BY distance ASC";
 
 			//$query = "SELECT * FROM tbl_emerg_centers WHERE LOC_LAT = '$lat' AND LOC_LON='$lon'";
@@ -228,14 +231,18 @@
 			$result = mysql_query($query) or die(mysql_error());
 			if(mysql_affected_rows() > 0){
 				$i=1;
-				$contacts = array();
+				$contacts = array("phone1"=>"","phone2"=>"","phone3"=>"");
 				while($row = mysql_fetch_assoc($result)){
 
-					$contact = array('phone'.$i => $row['CONTACT']);
-					$i = $i +1;
-					array_push($contacts, $contact);
+					if($i>=1 && $i<=3){
+						$contacts['phone'.$i] = $row['CONTACT'];
+						$i = $i +1;
+						//array_push($contacts, $contact);
+					}
 				}
-				return $contacts;
+				$contacts_array = array();
+				array_push($contacts_array, $contacts);
+				return $contacts_array;
 			}else{
 				return "";
 			}
