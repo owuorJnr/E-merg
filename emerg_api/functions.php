@@ -222,7 +222,7 @@
 
 		private function get_center_contacts($center_no){
 
-			$verified = "NO";
+			$verified = "YES";
 
 			$query = "SELECT * FROM tbl_center_contacts WHERE CENTER_NO = '$center_no' AND VERIFIED='$verified'";
 			$result = mysql_query($query) or die(mysql_error());

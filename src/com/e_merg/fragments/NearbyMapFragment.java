@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.e_merg.interfaces.IMakeCall;
 import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.services.GPSTracker;
 import com.e_merg.types.Center;
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class NearbyMapFragment extends SupportMapFragment implements OnMarkerClickListener{
 
 	OnChangeFragmentListener fragmentListener;
+	IMakeCall iMakeCall;
     GoogleMap map;
     GPSTracker gpsTracker;
 
@@ -53,6 +55,7 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
     private static String TAG_CATEGORY = "cat";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
+    private static String TAG_CONTACTS = "contacts";
     private static String TAG_PHONE1 = "phone1";
     private static String TAG_PHONE2 = "phone2";
     private static String TAG_PHONE3 = "phone3";
@@ -95,8 +98,9 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
 		super.onAttach(activity);
 		try {
             fragmentListener = (OnChangeFragmentListener)activity;
+            iMakeCall = (IMakeCall)activity;
         }catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener");
+            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener and IMakeCall");
         }
 	}
     
@@ -104,6 +108,7 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
 	public void onDetach() {
 		// TODO Auto-generated method stub
 		fragmentListener = null;
+		iMakeCall = null;
 		super.onDetach();
 	}
 
@@ -125,6 +130,7 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
 					Center center = listCenters.get(i);
 					if(title.equalsIgnoreCase(center.getName())){
 						//call number
+						iMakeCall.makeCall(center.getPhone1());
 					}
 				}
 			}
@@ -194,9 +200,14 @@ public class NearbyMapFragment extends SupportMapFragment implements OnMarkerCli
 	                        String category = s.getString(TAG_CATEGORY);
 	                        String lat = s.getString(TAG_LAT);
 	                        String lon = s.getString(TAG_LON);
-	                        String phone1 = s.getString(TAG_PHONE1);
-	                        String phone2 = s.getString(TAG_PHONE2);
-	                        String phone3 = s.getString(TAG_PHONE3);
+	                        
+	                        JSONArray contacts = s.getJSONArray(TAG_CONTACTS);
+	                        JSONObject contact = contacts.getJSONObject(0);
+	                        
+	                        String phone1 = contact.getString(TAG_PHONE1);
+	                        String phone2 = contact.getString(TAG_PHONE2);
+	                        String phone3 = contact.getString(TAG_PHONE3);
+	                        
 	                        String email = s.getString(TAG_EMAIL);
 	                        String services = s.getString(TAG_SERVICES);
 	                        

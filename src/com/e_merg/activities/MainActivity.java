@@ -2,16 +2,21 @@ package com.e_merg.activities;
 
 import java.lang.reflect.Field;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
+import android.widget.Toast;
 
 import com.e_merg.R;
 import com.e_merg.fragments.AboutFragment;
@@ -19,10 +24,11 @@ import com.e_merg.fragments.NavigationDrawerFragment;
 import com.e_merg.fragments.NearbyFragment;
 import com.e_merg.fragments.NearbyMapFragment;
 import com.e_merg.fragments.PickLocationMapFragment;
+import com.e_merg.interfaces.IMakeCall;
 import com.e_merg.interfaces.OnChangeFragmentListener;
 
 public class MainActivity extends ActionBarActivity implements
-		NavigationDrawerFragment.NavigationDrawerCallbacks,OnChangeFragmentListener {
+		NavigationDrawerFragment.NavigationDrawerCallbacks,OnChangeFragmentListener,IMakeCall {
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -70,6 +76,10 @@ public class MainActivity extends ActionBarActivity implements
 		if (savedInstanceState == null) {
 			currentCenterNo = "";
 		}
+		
+		EndCallListener callListener = new EndCallListener();
+		TelephonyManager mTM = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+		mTM.listen(callListener, PhoneStateListener.LISTEN_CALL_STATE);
 	}
 
 	@Override
@@ -161,6 +171,60 @@ public class MainActivity extends ActionBarActivity implements
 		getSupportFragmentManager().beginTransaction()
 		.replace(R.id.container, fragment,"New Fragment")
 		.commit();
+	}
+
+	@Override
+	public void makeCall(String number) {
+		// TODO Auto-generated method stub
+		if(!number.equalsIgnoreCase("")){
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
+			startActivity(intent);
+		}else{
+			Toast.makeText(getBaseContext(), "No Verified Contact Found!", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	private class EndCallListener extends PhoneStateListener {
+		
+		private boolean isPhoneCalling = false;
+		private static final String LOG_TAG = "EndCallListener";
+		
+		@Override
+		public void onCallStateChanged(int state, String incomingNumber) {
+
+			if (TelephonyManager.CALL_STATE_RINGING == state) {
+				// phone ringing
+				Log.i(LOG_TAG, "RINGING, number: " + incomingNumber);
+			}
+
+			if (TelephonyManager.CALL_STATE_OFFHOOK == state) {
+				// active
+				Log.i(LOG_TAG, "OFFHOOK");
+
+				isPhoneCalling = true;
+			}
+
+			if (TelephonyManager.CALL_STATE_IDLE == state) {
+				// run when class initial and phone call ended, 
+				// need detect flag from CALL_STATE_OFFHOOK
+				Log.i(LOG_TAG, "IDLE");
+
+				if (isPhoneCalling) {
+
+					Log.i(LOG_TAG, "restart app");
+
+					// restart app
+					Intent i = getBaseContext().getPackageManager()
+						.getLaunchIntentForPackage(
+							getBaseContext().getPackageName());
+					i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(i);
+
+					isPhoneCalling = false;
+				}
+
+			}
+	    }
 	}
 
 

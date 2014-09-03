@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.e_merg.R;
 import com.e_merg.adapters.CenterAdapter;
+import com.e_merg.interfaces.IMakeCall;
 import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.services.GPSTracker;
 import com.e_merg.types.Center;
@@ -36,6 +37,7 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 	GPSTracker gpsTracker;
 	
 	OnChangeFragmentListener fragmentListener;
+	IMakeCall iMakeCall;
 	ListView listView;
 	CenterAdapter centerAdapter;
 	List<Center> listCenters;
@@ -56,6 +58,7 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
     private static String TAG_CATEGORY = "cat";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
+    private static String TAG_CONTACTS = "contacts";
     private static String TAG_PHONE1 = "phone1";
     private static String TAG_PHONE2 = "phone2";
     private static String TAG_PHONE3 = "phone3";
@@ -103,8 +106,9 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 		super.onAttach(activity);
 		try {
             fragmentListener = (OnChangeFragmentListener)activity;
+            iMakeCall = (IMakeCall)activity;
         }catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener");
+            throw new ClassCastException(activity.toString() + " must implement OnChangeFragmentListener and IMakeCall");
         }
 	}
 
@@ -112,6 +116,7 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 	public void onDetach() {
 		// TODO Auto-generated method stub
 		fragmentListener = null;
+		iMakeCall = null;
 		super.onDetach();
 	}
 	
@@ -119,6 +124,8 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 	public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
 		// TODO Auto-generated method stub
 		//call emergency number
+		Center center = (Center) listView.getItemAtPosition(position);
+		iMakeCall.makeCall(center.getPhone1());
 	}
 	
 	private class GetCenterList extends AsyncTask<String, String, String> {
@@ -170,9 +177,14 @@ public class NearbyFragment extends ListFragment implements OnItemClickListener{
 	                        String category = s.getString(TAG_CATEGORY);
 	                        String lat = s.getString(TAG_LAT);
 	                        String lon = s.getString(TAG_LON);
-	                        String phone1 = s.getString(TAG_PHONE1);
-	                        String phone2 = s.getString(TAG_PHONE2);
-	                        String phone3 = s.getString(TAG_PHONE3);
+	                        
+	                        JSONArray contacts = s.getJSONArray(TAG_CONTACTS);
+	                        JSONObject contact = contacts.getJSONObject(0);
+	                        
+	                        String phone1 = contact.getString(TAG_PHONE1);
+	                        String phone2 = contact.getString(TAG_PHONE2);
+	                        String phone3 = contact.getString(TAG_PHONE3);
+	                        
 	                        String email = s.getString(TAG_EMAIL);
 	                        String services = s.getString(TAG_SERVICES);
 	                        
