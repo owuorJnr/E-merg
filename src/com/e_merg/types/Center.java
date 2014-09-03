@@ -9,10 +9,13 @@ public class Center {
      private String phone1;
      private String phone2;
      private String phone3;
+     private String category;
      private String services;
      
+     private String email;
+     
 
-     public Center(String name,double lat,double lon,String phone1,String phone2,String phone3,String services){
+     public Center(String name,double lat,double lon,String phone1,String phone2,String phone3,String services,String cat,String email){
          this.name = name;
          this.lat = lat;
          this.lon = lon;
@@ -20,6 +23,8 @@ public class Center {
          this.phone2 = phone2;
          this.phone3 = phone3;
          this.services = services;
+         this.category = cat;
+         this.email = email;
      }
 
      public String getName(){
@@ -48,6 +53,14 @@ public class Center {
      
      public String getServices(){
          return services;
+     }
+     
+     public String getCategory(){
+         return category;
+     }
+     
+     public String getEmail(){
+         return email;
      }
 	
 }

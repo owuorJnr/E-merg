@@ -8,12 +8,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.e_merg.R;
-import com.e_merg.activities.MainActivity;
-import com.e_merg.interfaces.OnChangeFragmentListener;
-import com.e_merg.types.ServiceHandler;
-import com.google.android.gms.maps.model.LatLng;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -31,6 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.e_merg.R;
+import com.e_merg.activities.MainActivity;
+import com.e_merg.adapters.SpinnerCategoryAdapter;
+import com.e_merg.interfaces.OnChangeFragmentListener;
+import com.e_merg.types.ServiceHandler;
+import com.google.android.gms.maps.model.LatLng;
+
 public class AddCenterFragment extends Fragment implements OnClickListener{
 //Will trigger AddServices
 	OnChangeFragmentListener fragmentListener;
@@ -40,6 +41,8 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
 	Spinner spCategory;
 	ImageView imgAdd1,imgAdd2,imgDel2,imgDel3;
 	Button btnNext;
+	
+	SpinnerCategoryAdapter spinnerAdapter;
 	
 	private static String url = "http://www.sharemiale.info.ke/emerg_api/index.php";
 	private ProgressDialog pDialog;
@@ -88,6 +91,12 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
 		imgDel2 = (ImageView)getView().findViewById(R.id.imgDelete2);
 		imgDel3 = (ImageView)getView().findViewById(R.id.imgDelete3);
 		btnNext = (Button)getView().findViewById(R.id.btnNext);
+		
+		spinnerAdapter = new SpinnerCategoryAdapter(getActivity(), getResources().getString(R.string.spCategoryHeader));
+		
+		String[] rawCategories = getResources().getStringArray(R.array.array_category);
+		spinnerAdapter.setListData(rawCategories);
+		spCategory.setAdapter(spinnerAdapter);
 		
 		imgAdd1.setOnClickListener(this);
 		imgAdd2.setOnClickListener(this);
@@ -157,7 +166,7 @@ public class AddCenterFragment extends Fragment implements OnClickListener{
 			//pick details and send online
 			name = editName.getText().toString().trim();
 			email = editEmail.getText().toString().trim();
-			category = (String) spCategory.getSelectedItem();
+			category = (String) spCategory.getSelectedItem().toString();
 			phone1 = editPhone1.getText().toString().trim();
 			phone2 = editPhone2.getText().toString().trim();
 			phone3 = editPhone3.getText().toString().trim();

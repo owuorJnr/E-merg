@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -29,7 +31,7 @@ import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.model.LatLng;
 
-public class NearbyFragment extends ListFragment{
+public class NearbyFragment extends ListFragment implements OnItemClickListener{
 
 	GPSTracker gpsTracker;
 	
@@ -51,8 +53,14 @@ public class NearbyFragment extends ListFragment{
     private static String TAG_ERROR_MSG = "error_msg";
     private static String TAG_CENTERS = "centers";
     private static String TAG_NAME = "name";
+    private static String TAG_CATEGORY = "cat";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
+    private static String TAG_PHONE1 = "phone1";
+    private static String TAG_PHONE2 = "phone2";
+    private static String TAG_PHONE3 = "phone3";
+    private static String TAG_EMAIL = "email";
+    private static String TAG_SERVICES = "services";
     
     JSONArray centers = null;
 	
@@ -86,9 +94,7 @@ public class NearbyFragment extends ListFragment{
             gpsTracker.showSettingsAlert();
         }
 	
-		/*Center center;
-		center = new Center("Strathmore Clinic", 0, 0, "0728558822", "0727775712","037129012", "Out-Patient Services");
-		listCenters.add(center);*/
+		listView.setOnItemClickListener(this);
 	}
 
 	@Override
@@ -107,6 +113,12 @@ public class NearbyFragment extends ListFragment{
 		// TODO Auto-generated method stub
 		fragmentListener = null;
 		super.onDetach();
+	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
+		// TODO Auto-generated method stub
+		//call emergency number
 	}
 	
 	private class GetCenterList extends AsyncTask<String, String, String> {
@@ -154,19 +166,18 @@ public class NearbyFragment extends ListFragment{
 	                    for(int i=0;i<centers.length();i++){
 	                        JSONObject s = centers.getJSONObject(i);
 	
-	                        //String id = s.getString(TAG_ID);
 	                        String name = s.getString(TAG_NAME);
+	                        String category = s.getString(TAG_CATEGORY);
 	                        String lat = s.getString(TAG_LAT);
 	                        String lon = s.getString(TAG_LON);
-	                        String phone1 = "";//s.getString(TAG_NAME);
-	                        String phone2 = "";//s.getString(TAG_LAT);
-	                        String phone3 = "";//s.getString(TAG_LON);
-	                        String detail = "";//s.getString(TAG_LAT);
-	                        /*String email = "";//s.getString(TAG_NAME);
-	                        String category = "";//s.getString(TAG_LON);
-	                        */
+	                        String phone1 = s.getString(TAG_PHONE1);
+	                        String phone2 = s.getString(TAG_PHONE2);
+	                        String phone3 = s.getString(TAG_PHONE3);
+	                        String email = s.getString(TAG_EMAIL);
+	                        String services = s.getString(TAG_SERVICES);
 	                        
-	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,detail);
+	                        
+	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,services,category,email);
 	                		listCenters.add(center);
 	
 	                    }

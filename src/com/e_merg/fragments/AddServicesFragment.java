@@ -25,8 +25,10 @@ import android.widget.Toast;
 
 import com.e_merg.R;
 import com.e_merg.activities.MainActivity;
+import com.e_merg.adapters.SpinnerServiceAdapter;
 import com.e_merg.interfaces.OnChangeFragmentListener;
 import com.e_merg.types.ServiceHandler;
+import com.e_merg.types.ServiceItem;
 
 public class AddServicesFragment extends Fragment implements OnClickListener{
 
@@ -35,6 +37,8 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
 	EditText editOther;
 	Spinner spServices;
 	Button btnSkip,btnFinish;
+	
+	SpinnerServiceAdapter spinnerAdapter;
 	
 	private static String url = "http://www.sharemiale.info.ke/emerg_api/index.php";
 	private ProgressDialog pDialog;
@@ -65,6 +69,18 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
 		spServices = (Spinner)getView().findViewById(R.id.spServices);
 		btnSkip = (Button)getView().findViewById(R.id.btnSkip);
 		btnFinish = (Button)getView().findViewById(R.id.btnFinish);
+		
+		spinnerAdapter = new SpinnerServiceAdapter(getActivity(), getResources().getString(R.string.spServiceHeader),  
+				getResources().getString(R.string.spServiceSubHeader));
+		
+		String[] rawRervices = getResources().getStringArray(R.array.array_services);
+		ServiceItem[] serviceItems = new ServiceItem[rawRervices.length];
+		for(int i=0;i<rawRervices.length;i++){
+			serviceItems[i] = new ServiceItem(rawRervices[i],false);
+		}
+		spinnerAdapter.setListData(serviceItems);
+		spServices.setAdapter(spinnerAdapter);
+		
 		
 		btnSkip.setOnClickListener(this);
 		btnFinish.setOnClickListener(this);
@@ -98,10 +114,18 @@ public class AddServicesFragment extends Fragment implements OnClickListener{
 			
 		}else if(v == btnFinish){
 			//pick services and send online
-			String services = spServices.getSelectedItem().toString();
-			services = services.concat(","+editOther.getText().toString().trim());
+			String services = "";
 			
-			if(services.equalsIgnoreCase(",")){
+			for(int i=0;i<spinnerAdapter.getCount();i++){
+				ServiceItem serviceItem = spinnerAdapter.getItem(i);
+				if(serviceItem.isSelected()){
+					services = services.concat(serviceItem.getService()+", ");
+				}
+			}
+			
+			services = services.concat(editOther.getText().toString().trim());
+			
+			if(services.equalsIgnoreCase("")){
 				Toast.makeText(getActivity(), "Enter Service", Toast.LENGTH_SHORT).show();		
 			}else{
 				new AddCenterService().execute();

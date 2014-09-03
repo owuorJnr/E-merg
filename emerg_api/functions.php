@@ -45,7 +45,7 @@
 			return json_encode($this->response);
 		}//end of function test
 
-		function add_center($name,$lat,$lon,$email,$phone1,$phone2,$phone3)
+		function add_center($name,$category,$lat,$lon,$email,$phone1,$phone2,$phone3)
 		{
 
 			if($name == "" || $lat=="" || $lon=="" || $phone1==""){
@@ -60,7 +60,7 @@
 				if($alreadyAdded == FALSE){
 					//generate center_no
 					$center_no = uniqid('cntr.');
-					$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$lat','$lon','$email',NOW())";
+					$query = "INSERT INTO tbl_emerg_centers(CENTER_NO,NAME,CATEGORY,LOC_LAT,LOC_LON,EMAIL,CREATED_AT) VALUES('$center_no','$name','$category','$lat','$lon','$email',NOW())";
 					$result = mysql_query($query) or die(mysql_error());
 					if(mysql_affected_rows() > 0){
 						$verified = "NO";
@@ -151,9 +151,16 @@
     			while ($row = mysql_fetch_assoc($result)) {
 			        $itemArray = array();
 
+			        $center_no = $row['CENTER_NO'];
 			        $itemArray["name"] = $row['NAME'];
+			        $itemArray["cat"] = $row['CATEGORY'];
 			        $itemArray["lat"] = $row['LOC_LAT'];
 			        $itemArray["lon"] = $row['LOC_LON'];
+			        $itemArray["email"] = $row['EMAIL'];
+			        $itemArray["contacts"] = $this->get_center_contacts($center_no);
+			        //$itemArray["phone2"] = $row['NAME'];
+			        //$itemArray["phone3"] = $row['NAME'];
+			        $itemArray["services"] = $this->get_center_services($center_no);
 			        array_push($this->response["centers"], $itemArray );
 
 			    }
@@ -187,26 +194,67 @@
 
 		private function add_contact($center_no,$contact,$verified)
 		{
-			
-			$query = "SELECT * FROM tbl_center_contacts WHERE CENTER_NO = '$center_no' AND CONTACT='$contact'";
-			$result = mysql_query($query) or die(mysql_error());
-			if(mysql_affected_rows() > 0){
-				return TRUE;
+			if($contact != ""){
 
-			}else{
-				
-				$query = "INSERT INTO tbl_center_contacts(CENTER_NO,CONTACT,VERIFIED) VALUES('$center_no','$contact','$verified')";
+				$query = "SELECT * FROM tbl_center_contacts WHERE CENTER_NO = '$center_no' AND CONTACT='$contact'";
 				$result = mysql_query($query) or die(mysql_error());
 				if(mysql_affected_rows() > 0){
-
 					return TRUE;
+
 				}else{
+					
+					$query = "INSERT INTO tbl_center_contacts(CENTER_NO,CONTACT,VERIFIED) VALUES('$center_no','$contact','$verified')";
+					$result = mysql_query($query) or die(mysql_error());
+					if(mysql_affected_rows() > 0){
 
-					return FALSE;
+						return TRUE;
+					}else{
+
+						return FALSE;
+					}
+
 				}
-
+			}else{
+				return FALSE;
 			}
+			
+		}//end of function
 
+		private function get_center_contacts($center_no){
+
+			$verified = "NO";
+
+			$query = "SELECT * FROM tbl_center_contacts WHERE CENTER_NO = '$center_no' AND VERIFIED='$verified'";
+			$result = mysql_query($query) or die(mysql_error());
+			if(mysql_affected_rows() > 0){
+				$i=1;
+				$contacts = array();
+				while($row = mysql_fetch_assoc($result)){
+
+					$contact = array('phone'.$i => $row['CONTACT']);
+					$i = $i +1;
+					array_push($contacts, $contact);
+				}
+				return $contacts;
+			}else{
+				return "";
+			}
+		}//end of function
+
+		private function get_center_services($center_no){
+
+			$query = "SELECT * FROM tbl_center_services WHERE CENTER_NO = '$center_no'";
+			$result = mysql_query($query) or die(mysql_error());
+			if(mysql_affected_rows() > 0){
+				if($row = mysql_fetch_assoc($result)){
+
+					return $row['SERVICE'];
+				}else{
+					return "";
+				}
+			}else{
+				return "";
+			}
 		}//end of function
 
 	}

@@ -10,7 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,12 +24,14 @@ import com.e_merg.types.Center;
 import com.e_merg.types.ServiceHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class NearbyMapFragment extends SupportMapFragment{
+public class NearbyMapFragment extends SupportMapFragment implements OnMarkerClickListener{
 
 	OnChangeFragmentListener fragmentListener;
     GoogleMap map;
@@ -46,8 +50,14 @@ public class NearbyMapFragment extends SupportMapFragment{
     private static String TAG_ERROR_MSG = "error_msg";
     private static String TAG_CENTERS = "centers";
     private static String TAG_NAME = "name";
+    private static String TAG_CATEGORY = "cat";
     private static String TAG_LAT = "lat";
     private static String TAG_LON = "lon";
+    private static String TAG_PHONE1 = "phone1";
+    private static String TAG_PHONE2 = "phone2";
+    private static String TAG_PHONE3 = "phone3";
+    private static String TAG_EMAIL = "email";
+    private static String TAG_SERVICES = "services";
     
     private static LatLng ME;
 	private int radius;
@@ -75,6 +85,8 @@ public class NearbyMapFragment extends SupportMapFragment{
             // Ask user to enable GPS/network in settings
             gpsTracker.showSettingsAlert();
         }
+        
+        map.setOnMarkerClickListener(this);;
     }
 
     @Override
@@ -96,6 +108,43 @@ public class NearbyMapFragment extends SupportMapFragment{
 	}
 
 
+    @Override
+	public boolean onMarkerClick(Marker marker) {
+		// TODO Auto-generated method stub
+    	final String title = marker.getTitle();
+    	AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+		alertBuilder.setTitle("Call Emergency");
+		alertBuilder.setMessage("Call "+title);
+		alertBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				
+				for(int i=0;i<listCenters.size();i++){
+					Center center = listCenters.get(i);
+					if(title.equalsIgnoreCase(center.getName())){
+						//call number
+					}
+				}
+			}
+			
+		});
+		
+		alertBuilder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+			
+		});
+		alertBuilder.create().show();
+		
+		return true;
+	}
+    
 
     private class GetCenterLocations extends AsyncTask<String, String, String> {
 
@@ -141,19 +190,18 @@ public class NearbyMapFragment extends SupportMapFragment{
 	                    for(int i=0;i<centers.length();i++){
 	                        JSONObject s = centers.getJSONObject(i);
 	
-	                        //String id = s.getString(TAG_ID);
 	                        String name = s.getString(TAG_NAME);
+	                        String category = s.getString(TAG_CATEGORY);
 	                        String lat = s.getString(TAG_LAT);
 	                        String lon = s.getString(TAG_LON);
-	                        String phone1 = "";//s.getString(TAG_NAME);
-	                        String phone2 = "";//s.getString(TAG_LAT);
-	                        String phone3 = "";//s.getString(TAG_LON);
-	                        String detail = "";//s.getString(TAG_LAT);
-	                        /*String email = "";//s.getString(TAG_NAME);
-	                        String category = "";//s.getString(TAG_LON);
-	                        */
+	                        String phone1 = s.getString(TAG_PHONE1);
+	                        String phone2 = s.getString(TAG_PHONE2);
+	                        String phone3 = s.getString(TAG_PHONE3);
+	                        String email = s.getString(TAG_EMAIL);
+	                        String services = s.getString(TAG_SERVICES);
 	                        
-	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,detail);
+	                        
+	                		center = new Center(name, Double.parseDouble(lat), Double.parseDouble(lon), phone1,phone2,phone3,services,category,email);
 	                		listCenters.add(center);
 	
 	                    }

@@ -34,12 +34,16 @@
     <string name="btn_skip">Skip</string>
     <string name="btn_finish">Finish</string>
     
-    <string name="hint_phone1">Enter emergency phone 1</string>
-    <string name="hint_phone2">phone 2</string>
-    <string name="hint_phone3">phone 3</string>
-    <string name="hint_email">email</string>
+    <string name="hint_phone1">Emergency phone 1</string>
+    <string name="hint_phone2">phone 2 (optional)</string>
+    <string name="hint_phone3">phone 3 (optional)</string>
+    <string name="hint_email">email (optional)</string>
     <string name="hint_name">name of center</string>
     <string name="hint_other_service">if not listed,add here</string>
+    
+    <string name="spServiceHeader">Service</string>
+    <string name="spServiceSubHeader">Select Service(s)</string>
+    <string name="spCategoryHeader">Select Category</string>
     
 
 </resources>
