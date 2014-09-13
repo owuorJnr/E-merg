@@ -45,6 +45,23 @@
 			return json_encode($this->response);
 		}//end of function test
 
+		function search_center($lat,$lon){
+
+			$alreadyAdded = $this->check_location($lat,$lon);
+
+			if($alreadyAdded == TRUE){
+
+				$this->response["error"] = 1;
+				$this->response["error_msg"] = "Center already exists!";
+
+			}else{
+
+				$this->response["success"] = 1;
+				$this->response["success_msg"] = "This is a new Center";
+			}
+
+		}//end of function search_center
+
 		function add_center($name,$category,$lat,$lon,$email,$phone1,$phone2,$phone3)
 		{
 

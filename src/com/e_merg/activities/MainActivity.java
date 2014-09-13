@@ -189,12 +189,14 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	@Override
-	public void makeCall(String number) {
+	public void makeCall(String phoneNo) {
 		// TODO Auto-generated method stub
-		if(!number.equalsIgnoreCase("")){
+		if(!phoneNo.equalsIgnoreCase("")){
 			try{
-			Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(number));
-			startActivity(intent);
+			Intent callIntent = new Intent(Intent.ACTION_DIAL);
+			callIntent.setData(Uri.parse("tel:"+Uri.encode(phoneNo.trim())));
+			callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(callIntent);
 			}catch(Exception e){
 				Log.e("MainActivity","Calling Error > "+ e.toString());
 			}

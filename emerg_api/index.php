@@ -20,10 +20,12 @@
 			//echo $emerg->add_services()."<br>";
 			//echo $emerg->get_centers()."<br>";
 		
-		/*}else if($req == "check-location"){
+		}else if($req == "search-center"){
 
 			$lat = filter_input(INPUT_POST, 'lat', FILTER_SANITIZE_STRING);
-			$lon = filter_input(INPUT_POST, 'lon', FILTER_SANITIZE_STRING);*/
+			$lon = filter_input(INPUT_POST, 'lon', FILTER_SANITIZE_STRING);
+
+			echo $emerg->search_center($lat,$lon);
 
 		}else if($req == "add-center"){
 			
