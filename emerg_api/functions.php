@@ -242,13 +242,14 @@
 
 		private function get_center_contacts($center_no){
 
+			$contacts = array("phone1"=>"","phone2"=>"","phone3"=>"");
 			$verified = "YES";
 
 			$query = "SELECT * FROM tbl_center_contacts WHERE CENTER_NO = '$center_no' AND VERIFIED='$verified'";
 			$result = mysql_query($query) or die(mysql_error());
 			if(mysql_affected_rows() > 0){
 				$i=1;
-				$contacts = array("phone1"=>"","phone2"=>"","phone3"=>"");
+				
 				while($row = mysql_fetch_assoc($result)){
 
 					if($i>=1 && $i<=3){
@@ -261,7 +262,14 @@
 				array_push($contacts_array, $contacts);
 				return $contacts_array;
 			}else{
-				return "";
+
+				$contacts['phone1'] = "";
+				$contacts['phone2'] = "";
+				$contacts['phone3'] = "";
+
+				$contacts_array = array();
+				array_push($contacts_array, $contacts);
+				return $contacts_array;
 			}
 		}//end of function
 
